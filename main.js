@@ -27,57 +27,79 @@
 		var inputArray;
 // UI
 	// Initiate Simulator State
+		function simInit() {
+			// Set Ball Position
+			$("circle").attr({
+				cy: windowHeight * 0.75, cx: 20, r: 20
+			});
+		}
 		$(document).ready(function() {
 			// Canvas Resize
 			windowHeight = window.innerHeight;
 			$("#canvas").css('height', windowHeight);
 			$("svg").css('height', windowHeight * 0.8);
-			// Set Ball Position
-			$("circle").attr({
-				cy: windowHeight * 0.75
+			simInit()
 			});
-		});
 
 	// Reset	
 		$("#reset-btn").on('click', function(event) {
 			event.preventDefault();
 			/* Act on the event */
+			simActive = false;
 			$("#velocityInput,#angleInput,#ballRadius").val("");
-			console.log("Test")
+			simInit();
 		});	
-
+	// Check if Input is a Number
+			function numCheck(inputValue) {
+				if (isNaN(parseInt( inputValue ))) {
+					alert("One of your input values are not numbers");
+					console.error("Invalid Input Values");
+					return false; 
+				} 
+				else { 
+					return true;
+				}
+			}		
 	// Button Event
 	$("#start-btn").on('click', function(event) {
 			event.preventDefault();
 			/* Act on the event */
-			simActive = true;
+			
+			// Set simulator state to active
+			// simActive = true;
 			
 		 	// Set Ball Radius
-		 	ballRadius = parseInt($("#ballRadius").val())
+		 	ballRadius = $("#ballRadius").val();
+		 		// Validate Radius
+		 		simActive = numCheck(ballRadius);
 
 			// Set Velocity
-			velocityInput = parseInt($("#velocityInput").val())
-			velocityX = Math.cos(angleRad); 
-			velocityY = Math.sin(angleRad);
+			velocityInput = $("#velocityInput").val();
+				// Validate Velocity
+		 		simActive = numCheck(velocityInput);
+
+				velocityX = Math.cos(angleRad); 
+				velocityY = Math.sin(angleRad);
 
 			// Set Angle
-			angleDeg = parseInt($("#angleInput").val());
+			angleDeg = $("#angleInput").val();
+				// Validate Angle
+		 		simActive = numCheck(angleDeg);
+
 			angleRad = radToDeg(angleDeg);
 
+			// Set Start Time 
+			startTime = new Date();
 			// Initiate Render Loop
-			setInterval(render,1);
+			if (simActive) {
+				setInterval(render,1);				
+			}
 			// DEBUG
 				console.log("Sim Started " + "SimActive: " + simActive);
 
 				// Start DEBUG loop
-				setInterval(debug,1000)
-
-		// Input
-			// Velocity Validation
-
-			// Angle Validation
-		}
-	)
+				setInterval(debug,1000);
+			})	
 
 // Degree to Radians Calculator
 	function radToDeg(angle) {
@@ -86,9 +108,10 @@
 // Render
 	function render() {
 		// Update Time
-			time = new Date().getTime();
+			// time = new Date().getTime();
 			currTime = new Date().getTime();
 			timeDelta = 0.001 * (currTime - startTime);
+			console.log("timeDelta: " + timeDelta);
 		// Set Velocities
 		velocityX = Math.cos(angleRad)*velocityInput;
 		velocityY = Math.sin(angleRad)*velocityInput;
@@ -96,13 +119,14 @@
 		// Distance 
 		ballX = velocityX * timeDelta;
 		ballY =  (windowHeight * 0.75) - (velocityY*timeDelta + 0.5*acceleration*(Math.pow(timeDelta,2)));
-		
+		console.log("ballY: " + ballY )
 		// Apply Attributes
 			$("circle").attr({
-			cx: ballX + ballRadius,
+			cx: (ballX + ballRadius),
 			cy: ballY ,
 			r: ballRadius
 			});
+
 		}
 		
 // Collision
@@ -117,5 +141,6 @@
 		// 		console.log("gameStateArray");
 		// 		console.log("inputArray")
 		console.log(timeDelta)
+
 	}
 			
