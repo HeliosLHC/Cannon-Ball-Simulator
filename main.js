@@ -5,6 +5,8 @@
 	var ballY = parseInt($("circle").attr('cy'));
 	var velocityInput;
 	var angleDeg;
+	var renderLoop;
+	var debug;
 
 	// Dynamic Variables	
 	var currentVelocity;
@@ -23,8 +25,6 @@
 	// DEBUG
 		// gSA
 		var gameStateArray;
-		// iA
-		var inputArray;
 // UI
 	// Initiate Simulator State
 		function simInit() {
@@ -92,13 +92,14 @@
 			startTime = new Date();
 			// Initiate Render Loop
 			if (simActive) {
-				setInterval(render,1);				
+				renderLoop = setInterval(render,1);
+				renderLoop;				
 			}
 			// DEBUG
 				console.log("Sim Started " + "SimActive: " + simActive);
-
 				// Start DEBUG loop
-				setInterval(debug,1000);
+				var debug = setInterval(debug,1000);
+				debug;
 			})	
 
 // Degree to Radians Calculator
@@ -107,11 +108,20 @@
 	}
 // Render
 	function render() {
+		// Check Sim Active
+		if (simActive) {
+
+		} 
+			else {
+				clearInterval(renderLoop);
+				clearInterval(debug);
+				alert("Simulation has ended");
+			}
 		// Update Time
 			// time = new Date().getTime();
 			currTime = new Date().getTime();
 			timeDelta = 0.001 * (currTime - startTime);
-			console.log("timeDelta: " + timeDelta);
+			
 		// Set Velocities
 		velocityX = Math.cos(angleRad)*velocityInput;
 		velocityY = Math.sin(angleRad)*velocityInput;
@@ -119,28 +129,29 @@
 		// Distance 
 		ballX = velocityX * timeDelta;
 		ballY =  (windowHeight * 0.75) - (velocityY*timeDelta + 0.5*acceleration*(Math.pow(timeDelta,2)));
-		console.log("ballY: " + ballY )
+		
 		// Apply Attributes
 			$("circle").attr({
 			cx: (ballX + ballRadius),
 			cy: ballY ,
 			r: ballRadius
 			});
-
-		}
+		// Collision
+			if (ballY > (windowHeight)) {
+			simActive = false;
+		} 
+	}
 		
-// Collision
-
 // DEBUG
 	function debug() {
-		// console.log("Velocities are")
-		// 		// Set DEBUG variables
-		// 		gameStateArray = {"simActive":simActive,"Time":currTime}
-		// 		inputArray = {"X Velocity":velocityX,"Y Velocity":velocityY}
-		// 		// Output DEBUG variables
-		// 		console.log("gameStateArray");
-		// 		console.log("inputArray")
-		console.log(timeDelta)
+		gameStateArray = {
+		"simActive": 	simActive,
+		"Time": 		currTime,
+		"timeDelta": 	timeDelta,
+		"ballX": 		ballX,
+		"ballY": 		ballY,
+		};
+		console.log(gameStateArray);
 
 	}
 			
